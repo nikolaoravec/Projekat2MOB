@@ -18,7 +18,7 @@ interface NoteRepository {
 
     fun updateTitleAndContentById(id:Long,title:String,content:String):Completable
 
-    fun update(id:Long,archive:Int):Completable
+    fun update(id:Long, isArchived:Boolean):Completable
 
     fun getByFilterArchive(archive: Int): Observable<List<Note>>
 

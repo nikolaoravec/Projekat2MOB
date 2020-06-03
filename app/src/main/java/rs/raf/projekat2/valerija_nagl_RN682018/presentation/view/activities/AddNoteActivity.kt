@@ -36,7 +36,7 @@ class AddNoteActivity : AppCompatActivity(R.layout.activity_add_note) {
         dodaj_btn.setOnClickListener {
             if (check()){
                 val intent = Intent()
-                val note = Note(0,et_title_add.text.toString(),et_content_add.text.toString(),0,
+                val note = Note(0,et_title_add.text.toString(),et_content_add.text.toString(),false,
                     Date()
                 )
                 intent.putExtra(BeleskeFragment.RECEVED_KEY, note)

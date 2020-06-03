@@ -118,9 +118,9 @@ class NoteViewModel(private val noteRepository: NoteRepository) :ViewModel(), No
         subscriptions.add(subscription)
     }
 
-    override fun update(id: Long, archive: Int) {
+    override fun update(id: Long, isArchived: Boolean) {
         val subscription = noteRepository
-            .update(id, archive)
+            .update(id, isArchived)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(

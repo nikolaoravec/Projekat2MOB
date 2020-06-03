@@ -5,12 +5,11 @@ import io.reactivex.Observable
 import rs.raf.projekat2.valerija_nagl_RN682018.data.datasources.local.NoteDao
 import rs.raf.projekat2.valerija_nagl_RN682018.data.models.Note
 import rs.raf.projekat2.valerija_nagl_RN682018.data.models.NoteEntity
-import java.util.*
 
 class NoteRepositoryImpl (private val noteDao: NoteDao) : NoteRepository {
 
     override fun insert(note: Note): Completable {
-        val noteEntity = NoteEntity(note.id,note.title,note.content,note.archive,note.date)
+        val noteEntity = NoteEntity(note.id,note.title,note.content,note.isArchived,note.date)
         return noteDao.insert(noteEntity)
     }
 
@@ -19,7 +18,7 @@ class NoteRepositoryImpl (private val noteDao: NoteDao) : NoteRepository {
             .getAll()
             .map {
                it.map {
-                   Note(it.id, it.title, it.content, it.archived, it.date)
+                   Note(it.id, it.title, it.content, it.isArchived, it.date)
                }
             }
     }
@@ -33,7 +32,7 @@ class NoteRepositoryImpl (private val noteDao: NoteDao) : NoteRepository {
             .getByFilter(titleContent)
             .map {
                 it.map {
-                    Note(it.id, it.title, it.content, it.archived, it.date)
+                    Note(it.id, it.title, it.content, it.isArchived, it.date)
                 }
             }
     }
@@ -42,8 +41,8 @@ class NoteRepositoryImpl (private val noteDao: NoteDao) : NoteRepository {
         return noteDao.updateTitleAndContentById(id, title, content)
     }
 
-    override fun update(id: Long, archive: Int): Completable {
-        return noteDao.update(id, archive)
+    override fun update(id: Long, isArchived: Boolean): Completable {
+        return noteDao.update(id, isArchived)
     }
 
     override fun getByFilterArchive(archive: Int): Observable<List<Note>> {
@@ -51,7 +50,7 @@ class NoteRepositoryImpl (private val noteDao: NoteDao) : NoteRepository {
             .getByFilterArchive(archive)
             .map {
                 it.map {
-                    Note(it.id, it.title, it.content, it.archived, it.date)
+                    Note(it.id, it.title, it.content, it.isArchived, it.date)
                 }
             }
     }

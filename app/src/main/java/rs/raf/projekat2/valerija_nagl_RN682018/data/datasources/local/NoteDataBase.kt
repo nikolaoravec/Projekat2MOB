@@ -8,7 +8,7 @@ import rs.raf.projekat2.valerija_nagl_RN682018.data.models.NoteEntity
 
 @Database(
     entities = [NoteEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false)
 
 @TypeConverters(DateConverter::class)

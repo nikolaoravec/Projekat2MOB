@@ -6,12 +6,20 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.activity_change_note.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import rs.raf.projekat2.valerija_nagl_RN682018.R
 import rs.raf.projekat2.valerija_nagl_RN682018.data.models.Note
+import rs.raf.projekat2.valerija_nagl_RN682018.presentation.contract.NoteContract
 import rs.raf.projekat2.valerija_nagl_RN682018.presentation.view.fragments.BeleskeFragment
+import rs.raf.projekat2.valerija_nagl_RN682018.presentation.view.states.ChangeNoteState
+import rs.raf.projekat2.valerija_nagl_RN682018.presentation.view.states.NotesState
+import rs.raf.projekat2.valerija_nagl_RN682018.presentation.viewmodel.NoteViewModel
 
 class EditActivity: AppCompatActivity(R.layout.activity_change_note) {
+
+    private val noteViewModel: NoteContract.ViewModel by viewModel<NoteViewModel>()
 
     private var note : Note? = null
 
@@ -27,6 +35,20 @@ class EditActivity: AppCompatActivity(R.layout.activity_change_note) {
     private fun init(){
         parseIntent()
         initListeners()
+        initObserver()
+    }
+
+    private fun initObserver() {
+        noteViewModel.changeDone.observe(this, Observer {
+            when(it) {
+                is ChangeNoteState.Success -> {
+                    finish()
+                }
+                else -> {
+                    Toast.makeText(this, "Error", Toast.LENGTH_LONG).show()
+                }
+            }
+        })
     }
 
     private fun initListeners(){
@@ -37,13 +59,9 @@ class EditActivity: AppCompatActivity(R.layout.activity_change_note) {
 
         izmeniBtn.setOnClickListener {
             if (check()){
-                val intent = Intent()
-                note!!.title = et_title_change.text.toString()
-                note!!.content = et_content_change.text.toString()
-                intent.putExtra(BeleskeFragment.RECEVED_KEY, note)
-                intent.putExtra(BeleskeFragment.ADD_KEY, "edit")
-                setResult(Activity.RESULT_OK, intent)
-                finish()
+                val title = et_title_change.text.toString()
+                val content = et_content_change.text.toString()
+                noteViewModel.updateTitleAndContentById(note!!.id, title, content)
             }
         }
     }

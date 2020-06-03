@@ -5,10 +5,10 @@ import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 @Parcelize
-class Note(
+data class Note(
     val id: Long,
     var title: String,
     var content: String,
-    var archive: Int,
+    var isArchived: Boolean,
     var date: Date
 ) : Parcelable

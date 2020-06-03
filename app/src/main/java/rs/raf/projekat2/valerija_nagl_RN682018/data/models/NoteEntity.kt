@@ -10,6 +10,6 @@ data class NoteEntity (
     val id:Long,
     val title:String,
     val content:String,
-    val archived:Int,
+    val isArchived:Boolean,
     val date: Date
 )

@@ -16,7 +16,7 @@ interface NoteContract {
         fun addNote(note : Note)
         fun getAllByFilter(titleContent : String)
         fun updateTitleAndContentById(id:Long,title:String,content:String)
-        fun update(id:Long,archive:Int)
+        fun update(id:Long, isArchived:Boolean)
         fun getAllByArchive(archive:Int)
 
     }

@@ -5,6 +5,7 @@ import rs.raf.projekat2.valerija_nagl_RN682018.data.models.Note
 import timber.log.Timber
 
 class NoteDiffCallback : DiffUtil.ItemCallback<Note>() {
+
     override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
 //        Timber.e("Usao sam u areItemsTheSame");
 
@@ -12,12 +13,17 @@ class NoteDiffCallback : DiffUtil.ItemCallback<Note>() {
     }
 
     override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
-//        Timber.e((oldItem.title == newItem.title
-//                && oldItem.content == newItem.content
-//                && oldItem.archive == newItem.archive).toString());
+
+        Timber.e(oldItem.toString())
+        Timber.e(newItem.toString())
+
+        Timber.e((oldItem.title == newItem.title
+                && oldItem.content == newItem.content
+                && oldItem.isArchived == newItem.isArchived).toString());
+
 
         return oldItem.title == newItem.title
                 && oldItem.content == newItem.content
-                && oldItem.archive == newItem.archive
+                && oldItem.isArchived == newItem.isArchived
     }
 }
