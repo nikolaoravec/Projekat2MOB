@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">StudentHelperApp</string>
+    <string name="odustani">Odustani</string>
+    <string name="izmeni">Izmeni</string>
+    <string name="dodaj">Dodaj</string>
+    <string name="pretraga_po_naslovu_sadrzaju">Naslov/Sadrzaj</string>
+</resources>

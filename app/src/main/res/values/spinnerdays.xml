@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="days_array">
+        <item></item>
+        <item>PON</item>
+        <item>UTO</item>
+        <item>SRE</item>
+        <item>\u010cET</item>
+        <item>PET</item>
+        <item>SUB</item>
+    </string-array>
+</resources>
