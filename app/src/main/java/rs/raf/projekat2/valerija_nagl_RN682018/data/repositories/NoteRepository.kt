@@ -1,10 +1,11 @@
 package rs.raf.projekat2.valerija_nagl_RN682018.data.repositories
 
+import androidx.lifecycle.LiveData
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Single
 import rs.raf.projekat2.valerija_nagl_RN682018.data.models.Note
 import rs.raf.projekat2.valerija_nagl_RN682018.data.models.NoteEntity
+import rs.raf.projekat2.valerija_nagl_RN682018.data.models.NoteFilter
 
 interface NoteRepository {
 
@@ -14,13 +15,12 @@ interface NoteRepository {
 
     fun delete(id:Long): Completable
 
-    fun getByFilter(titleContent:String): Observable<List<Note>>
+    fun getAllByFilter(noteFilter:NoteFilter): Observable<List<Note>>
 
     fun updateTitleAndContentById(id:Long,title:String,content:String):Completable
 
     fun update(id:Long, isArchived:Boolean):Completable
 
-    fun getByFilterArchive(archive: Int): Observable<List<Note>>
-
+    fun getAllChartData(): Observable<List<Int>>
 
 }

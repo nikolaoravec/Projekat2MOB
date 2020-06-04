@@ -17,11 +17,8 @@ abstract class NoteDao {
     @Query("SELECT * FROM notes")
     abstract fun getAll(): Observable<List<NoteEntity>>
 
-    @Query("SELECT * FROM notes WHERE ((title LIKE '%'|| :titleContent ||'%') OR (content LIKE '%'|| :titleContent ||'%'))")
-    abstract fun getByFilter(titleContent: String): Observable<List<NoteEntity>>
-
-    @Query("SELECT * FROM notes WHERE isArchived LIKE  :archive")
-    abstract fun getByFilterArchive(archive: Int): Observable<List<NoteEntity>>
+    @Query("SELECT * FROM notes WHERE ((title LIKE '%'|| :titleContent ||'%' AND isArchived = :isArchived) OR (content LIKE '%'|| :titleContent ||'%' AND isArchived = :isArchived))")
+    abstract fun getByFilter(titleContent: String,isArchived: Boolean): Observable<List<NoteEntity>>
 
     @Query("DELETE FROM notes")
     abstract fun deleteAll() : Completable
@@ -34,6 +31,9 @@ abstract class NoteDao {
 
     @Query("UPDATE notes SET isArchived = :isArchived WHERE id == :id")
     abstract fun update(id: Long, isArchived:Boolean): Completable
+
+    @Query("SELECT * FROM notes")
+    abstract fun getAllChartData(): Observable<List<NoteEntity>>
 
     @Transaction
     open fun deleteAndInsertAll(entities: List<NoteEntity>) {

@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.fragment_beleske.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import rs.raf.projekat2.valerija_nagl_RN682018.R
 import rs.raf.projekat2.valerija_nagl_RN682018.data.models.Note
+import rs.raf.projekat2.valerija_nagl_RN682018.data.models.NoteFilter
 import rs.raf.projekat2.valerija_nagl_RN682018.presentation.contract.NoteContract
 import rs.raf.projekat2.valerija_nagl_RN682018.presentation.view.activities.AddNoteActivity
 import rs.raf.projekat2.valerija_nagl_RN682018.presentation.view.activities.EditActivity
@@ -57,27 +58,6 @@ class BeleskeFragment : Fragment(R.layout.fragment_beleske) {
         noteAdapter =
             NoteAdapter(NoteDiffCallback()) { note: Note ,response : String ->
                 if (response=="archive"){
-                    // Ne smete da menjate objekat ovde, jer menjate objekat koji se nalazi u listi
-                    // u adapteru. I kada vam stigne nova lista iz base, u toj listi ce item takodje
-                    // imati izmenjeno archive kao sto ste ga izmenili i ovde i onda ce se u diffcallbacku
-                    // desiti to da su dva itema ista.
-                    // Samo apdejtujte podatke u bazi, a posle apdejta ce se trigerovati observable,
-                    // koji ce pokrenuti query ponovo i vratice vam sve podatke iz baze ponovo (sada apdejtovane)
-                    // i dobicete ih u observeru koji ste nakacili na notesState, gde ce se ta nova
-                    // lista submitovati u adapter i sadrzace apdejtovane objekte koji ce se porediti sa
-                    // starim objektima iz liste u adapteru i differ ce primetiti razlicitost i reci
-                    // adapteru da uradi onBind()
-//                    if (note.archive == 0) {
-//                        note.archive = 1;
-////                    this.iw_archive.setImageResource(R.drawable.unarchive)
-//
-//                    } else if (note.archive == 1) {
-//                        note.archive = 0;
-////                    this.iw_archive.setImageResource(R.drawable.archive)
-//                        noteViewModel.update(note.id,note.archive)
-//                    }
-
-                    // RADITE SAMO OVO
                     noteViewModel.update(note.id, !note.isArchived)
                 }else if(response=="delete"){
                     noteViewModel.deleteNote(note.id)
@@ -94,21 +74,29 @@ class BeleskeFragment : Fragment(R.layout.fragment_beleske) {
     private fun initListeners() {
 
         search_titleCo.addTextChangedListener {
-            noteViewModel.getAllByFilter(search_titleCo.text.toString())
+            val titleContent : String = search_titleCo.text.toString()
+            if (!switch_archive.isChecked){
+                val noteFilter = NoteFilter(titleContent,false)
+                noteViewModel.getAllByFilter(noteFilter)
+            }else{
+                val noteFilter = NoteFilter(titleContent,true)
+                noteViewModel.getAllByFilter(noteFilter)
+            }
         }
 
         btn_plus.setOnClickListener {
             val intent = Intent(this.activity,AddNoteActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE)
         }
-        
+
         switch_archive.setOnCheckedChangeListener { buttonView, isChecked ->
-//            if (isChecked){
-//                noteViewModel.getAllNotes()
-//            }
-//            if (!isChecked){
-//                noteViewModel.getAllByArchive(0)
-//            }
+            if (!isChecked){
+                val noteFilter = NoteFilter(search_titleCo.text.toString(),false)
+                noteViewModel.getAllByFilter(noteFilter)
+            }else{
+                val noteFilter = NoteFilter(search_titleCo.text.toString(),true)
+                noteViewModel.getAllByFilter(noteFilter)
+            }
         }
     }
 
@@ -118,12 +106,10 @@ class BeleskeFragment : Fragment(R.layout.fragment_beleske) {
             Timber.e("State observer ${it.toString()}")
             renderState(it)
         })
-        noteViewModel.changeDone.observe(viewLifecycleOwner, Observer {
-            Timber.e(it.toString())
-            renderAddState(it)
-        })
 
-        noteViewModel.getAllNotes()
+        val titleContent : String = search_titleCo.text.toString()
+        val noteFilter = NoteFilter(titleContent,false)
+        noteViewModel.getAllByFilter(noteFilter)
     }
 
     private fun renderState(state: NotesState) {
@@ -131,8 +117,6 @@ class BeleskeFragment : Fragment(R.layout.fragment_beleske) {
             is NotesState.Success -> {
                 showLoadingState(false)
                 Timber.e("Render state ${state.notes.toString()}")
-//                val listToSubmit = mutableListOf<Note>()
-//                listToSubmit.addAll(state.notes.map { Note(it.id, it.title, it.content, it.archive, it.date) })
                 noteAdapter.submitList(state.notes)
             }
             is NotesState.Error -> {
@@ -142,21 +126,21 @@ class BeleskeFragment : Fragment(R.layout.fragment_beleske) {
             is NotesState.Loading -> {
                 showLoadingState(true)
             }
+            is NotesState.Update -> {
+                Timber.e("Update success")
+                showLoadingState(true)
+            }
+            is NotesState.Add -> {
+                Timber.e("Add success")
+                showLoadingState(true)
+            }
+            is NotesState.Delete -> {
+                Timber.e("Delete success")
+                showLoadingState(true)
+            }
+
         }
     }
-
-    private fun renderAddState(state: ChangeNoteState) {
-        when (state) {
-            is ChangeNoteState.Success -> {
-                showLoadingState(false)
-            }
-            is ChangeNoteState.Error -> {
-                showLoadingState(false)
-                Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
 
     private fun showLoadingState(loading: Boolean) {
         layoutSearch.isVisible = !loading

@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import rs.raf.projekat2.valerija_nagl_RN682018.presentation.view.fragments.BeleskeFragment
+import rs.raf.projekat2.valerija_nagl_RN682018.presentation.view.fragments.GraphFragment
 import rs.raf.projekat2.valerija_nagl_RN682018.presentation.view.fragments.RasporedFragment
 
 class MainPagerAdapter(
@@ -13,7 +14,7 @@ class MainPagerAdapter(
 ) : FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     companion object {
-        private const val ITEM_COUNT = 2
+        private const val ITEM_COUNT = 3
         const val FRAGMENT_1 = 0
         const val FRAGMENT_2 = 1
     }
@@ -21,7 +22,8 @@ class MainPagerAdapter(
     override fun getItem(position: Int): Fragment {
         return when(position) {
             FRAGMENT_1 -> RasporedFragment()
-            else -> BeleskeFragment()
+            FRAGMENT_2 -> BeleskeFragment()
+            else -> GraphFragment()
         }
     }
 
@@ -32,7 +34,8 @@ class MainPagerAdapter(
     override fun getPageTitle(position: Int): CharSequence? {
         return when(position) {
             FRAGMENT_1 -> "RASPORED"
-            else -> "BELESKE"
+            FRAGMENT_2 -> "BELESKE"
+            else -> "GRAFIK"
         }
     }
 

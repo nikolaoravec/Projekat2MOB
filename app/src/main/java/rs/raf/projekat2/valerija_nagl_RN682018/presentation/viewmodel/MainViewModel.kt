@@ -12,7 +12,6 @@ import rs.raf.projekat2.valerija_nagl_RN682018.data.models.ClassFilter
 import rs.raf.projekat2.valerija_nagl_RN682018.data.models.Resource
 import rs.raf.projekat2.valerija_nagl_RN682018.data.repositories.ClassRepository
 import rs.raf.projekat2.valerija_nagl_RN682018.presentation.contract.MainContract
-import rs.raf.projekat2.valerija_nagl_RN682018.presentation.view.states.AddClassState
 import rs.raf.projekat2.valerija_nagl_RN682018.presentation.view.states.ClassesState
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -23,7 +22,7 @@ class MainViewModel(
 
     private val subscriptions = CompositeDisposable()
     override val classesState: MutableLiveData<ClassesState> = MutableLiveData()
-    override val addDone: MutableLiveData<AddClassState> = MutableLiveData()
+//    override val addDone: MutableLiveData<AddClassState> = MutableLiveData()
 
     private val publishSubject: PublishSubject<ClassFilter> = PublishSubject.create()
 
@@ -92,22 +91,22 @@ class MainViewModel(
         subscriptions.add(subscription)
     }
 
-    override fun addClass(c: Class) {
-        val subscription = classRepository
-            .insert(c)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                {
-                    addDone.value = AddClassState.Success
-                },
-                {
-                    addDone.value = AddClassState.Error("Error happened while adding movie")
-                    Timber.e(it)
-                }
-            )
-        subscriptions.add(subscription)
-    }
+//    override fun addClass(c: Class) {
+//        val subscription = classRepository
+//            .insert(c)
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe(
+//                {
+//                    addDone.value = AddClassState.Success
+//                },
+//                {
+//                    addDone.value = AddClassState.Error("Error happened while adding movie")
+//                    Timber.e(it)
+//                }
+//            )
+//        subscriptions.add(subscription)
+//    }
 
     override fun getAllByFilter(classFilter : ClassFilter){
         publishSubject.onNext(classFilter)

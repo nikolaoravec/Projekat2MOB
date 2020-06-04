@@ -1,5 +1,6 @@
 package rs.raf.projekat2.valerija_nagl_RN682018.presentation.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -7,6 +8,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import rs.raf.projekat2.valerija_nagl_RN682018.data.models.Note
+import rs.raf.projekat2.valerija_nagl_RN682018.data.models.NoteFilter
 import rs.raf.projekat2.valerija_nagl_RN682018.data.repositories.NoteRepository
 import rs.raf.projekat2.valerija_nagl_RN682018.presentation.contract.NoteContract
 import rs.raf.projekat2.valerija_nagl_RN682018.presentation.view.states.*
@@ -17,8 +19,9 @@ class NoteViewModel(private val noteRepository: NoteRepository) :ViewModel(), No
 
     override val changeDone: MutableLiveData<ChangeNoteState> = MutableLiveData()
     override val notesState: MutableLiveData<NotesState> = MutableLiveData()
+    override val chartData: MutableLiveData<List<Int>> = MutableLiveData()
     private val subscriptions = CompositeDisposable()
-    private val publishSubject: PublishSubject<String> = PublishSubject.create()
+    private val publishSubject: PublishSubject<NoteFilter> = PublishSubject.create()
 
     init {
         val subscription = publishSubject
@@ -26,7 +29,7 @@ class NoteViewModel(private val noteRepository: NoteRepository) :ViewModel(), No
             .distinctUntilChanged()
             .switchMap {
                 noteRepository
-                    .getByFilter(it)
+                    .getAllByFilter(it)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnError {
@@ -70,10 +73,10 @@ class NoteViewModel(private val noteRepository: NoteRepository) :ViewModel(), No
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 {
-                    changeDone.value = ChangeNoteState.Success
+                    notesState.value = NotesState.Delete
                 },
                 {
-                    changeDone.value = ChangeNoteState.Error("Error happened while removing note")
+                    notesState.value = NotesState.Error("Error happened while removing note")
                     Timber.e(it)
                 }
             )
@@ -87,18 +90,18 @@ class NoteViewModel(private val noteRepository: NoteRepository) :ViewModel(), No
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 {
-                    changeDone.value = ChangeNoteState.Success
+                    notesState.value = NotesState.Add
                 },
                 {
-                    changeDone.value = ChangeNoteState.Error("Error happened while adding note")
+                    notesState.value = NotesState.Error("Error happened while adding note")
                     Timber.e(it)
                 }
             )
         subscriptions.add(subscription)
     }
 
-    override fun getAllByFilter(titleContent: String) {
-        publishSubject.onNext(titleContent)
+    override fun getAllByFilter(noteFilter: NoteFilter) {
+        publishSubject.onNext(noteFilter)
     }
 
     override fun updateTitleAndContentById(id: Long, title: String, content: String) {
@@ -108,44 +111,44 @@ class NoteViewModel(private val noteRepository: NoteRepository) :ViewModel(), No
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 {
-                    changeDone.value = ChangeNoteState.Success
+                    notesState.value = NotesState.Update
                 },
                 {
-                    changeDone.value = ChangeNoteState.Error("Error happened while updating note")
+                    notesState.value = NotesState.Error("Error happened while updating note title/content")
                     Timber.e(it)
                 }
             )
         subscriptions.add(subscription)
     }
 
-    override fun update(id: Long, isArchived: Boolean) {
+    override fun update(id: Long, archive: Boolean) {
         val subscription = noteRepository
-            .update(id, isArchived)
+            .update(id, archive)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 {
-                    changeDone.value = ChangeNoteState.Success
+                    notesState.value = NotesState.Update
                 },
                 {
-                    changeDone.value = ChangeNoteState.Error("Error happened while updating note(Archive)")
+                    notesState.value = NotesState.Error("Error happened while updating note(Archive)")
                     Timber.e(it)
                 }
             )
         subscriptions.add(subscription)
     }
 
-    override fun getAllByArchive(archive: Int) {
+    override fun chartDataFetch() {
         val subscription = noteRepository
-            .getByFilterArchive(archive)
+            .getAllChartData()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 {
-                    notesState.value = NotesState.Success(it)
+//                    notesState.value = NotesState.Success(it)
+                    chartData.value = it
                 },
                 {
-                    notesState.value = NotesState.Error("Error happened while fetching data from db")
                     Timber.e(it)
                 }
             )
@@ -156,4 +159,6 @@ class NoteViewModel(private val noteRepository: NoteRepository) :ViewModel(), No
         super.onCleared()
         subscriptions.dispose()
     }
+
+
 }
